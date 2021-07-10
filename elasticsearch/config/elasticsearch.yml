@@ -1,13 +1,38 @@
----
-## Default Elasticsearch configuration from Elasticsearch base image.
-## https://github.com/elastic/elasticsearch/blob/master/distribution/docker/src/docker/config/elasticsearch.yml
-#
-cluster.name: "docker-cluster"
-network.host: 0.0.0.0
+## Cluster Settings
+cluster.name: "elk-tls-cluster"
+network.host: "0.0.0.0"
+http.host: 0.0.0.0
 
-## X-Pack settings
-## see https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-xpack.html
-#
+## License
 xpack.license.self_generated.type: trial
+
+# Security
 xpack.security.enabled: true
 xpack.monitoring.collection.enabled: true
+xpack.security.authc.token.enabled: true
+xpack.security.authc.api_key.enabled: true
+
+# transport security settings
+# This is mostly used for inter-node communications between parts of the ELK stack
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.key: ${CONFIG_DIR}/elasticsearch.key
+xpack.security.transport.ssl.certificate: ${CONFIG_DIR}/elasticsearch.crt
+xpack.security.transport.ssl.certificate_authorities: ${CONFIG_DIR}/ca.crt
+
+# HTTP security setttings
+# This is used for client server ssl/tls communications (e.g. browser to kibana)
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.key: ${CONFIG_DIR}/elasticsearch.key
+xpack.security.http.ssl.certificate: ${CONFIG_DIR}/elasticsearch.crt
+xpack.security.http.ssl.certificate_authorities: ${CONFIG_DIR}/ca.crt
+xpack.notification.email.account:
+    126_account:
+        profile: standard
+        email_defaults:
+            from: sdzhanglexin@126.com
+        smtp:
+            auth: true
+            starttls.enable: false
+            host: smtp.126.com
+            port: 25
+            user: sdzhanglexin@126.com
