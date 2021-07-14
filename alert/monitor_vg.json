@@ -1,0 +1,66 @@
+{
+  "trigger": {
+    "schedule": {
+      "interval": "1m"
+    }
+  },
+  "input": {
+    "search": {
+      "request": {
+        "search_type": "query_then_fetch",
+        "indices": [
+          "logs*"
+        ],
+        "rest_total_hits_as_int": true,
+        "body": {
+          "query": {
+            "bool": {
+              "filter": [
+                {
+                  "wildcard": {
+                    "message": "900*"
+                  }
+                },
+                {
+                  "range": {
+                    "@timestamp": {
+                      "gte": "now-1m"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "condition": {
+    "compare": {
+      "ctx.payload.hits.total": {
+        "gte": 1
+      }
+    }
+  },
+  "actions": {
+    "my-logging-action": {
+      "logging": {
+        "level": "info",
+        "text": "{{_source.message}}"
+      }
+    },
+    "send_mail": {
+      "email": {
+        "profile": "standard",
+        "from": "sdzhanglexin@126.com",
+        "to": [
+          "luke@hftech.cc"
+        ],
+        "subject": "重要通知!!!",
+        "body": {
+          "text": "{{ctx.payload.hits.hits.0._source}}"
+        }
+      }
+    }
+  }
+}
